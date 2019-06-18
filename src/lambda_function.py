@@ -99,7 +99,7 @@ def check_record_target(target, name, origin):
         fqdn = name + '.' + str(origin)
     fqdn = fqdn.rstrip('.')
     target = target.rstrip('.')
-    return fqdn.endswith('.' + target)
+    return fqdn.endswith('.' + target) or fqdn == target
 
 def convert_zone(domain, zone):
     new_zone = dns.zone.Zone(origin=(domain.rstrip('.') + '.'))
