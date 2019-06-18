@@ -5,6 +5,8 @@
 # (e.g. mirror 'activedirectory.example.org' on-premises zone to 'example.org' Route 53 zone)
 
 # This script is a fork of https://github.com/awslabs/aws-lambda-mirror-dns-function
+# with a modification for supporting multiple on-premise zones and single Route 53 hosted zone
+# and Python 3 support.
 #
 #  Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -188,7 +190,10 @@ def diff_zones(domain, zone1, zone2, ignore_ttl, domain_names_to_ignore):
                 record1 = node1.get_rdataset(record2.rdclass, record2.rdtype)
                 if record2.rdtype == dns.rdatatype.SOA:
                     continue
-                elif not record1:  # Create new record
+                if record2.rdtype == dns.rdatatype.NS and str(node) == '@':
+                    continue
+
+                if not record1:  # Create new record
                     changerec = []
                     for value2 in record2:
                         changerec.append(value2)
@@ -310,7 +315,7 @@ def perform_mirror(domain_names, domain_name, master_zone, route53_zone_id, rout
     else:
         vpc_serial = None
 
-    domain_names_to_ignore = [n for n in domain_names if n != domain_name and not domain_name.endswith(n)]
+    domain_names_to_ignore = [n for n in domain_names if n != domain_name]
 
     if vpc_serial and (vpc_serial > serial):
         print('ERROR: Route 53 VPC serial %s for domain %s is greater than existing serial %s' % (str(vpc_serial), domain_name, str(serial)))
