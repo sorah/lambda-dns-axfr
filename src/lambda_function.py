@@ -115,16 +115,16 @@ def convert_zone(domain, zone):
 
                 if rdataset.rdtype == dns.rdatatype.CNAME:
                     if not new_rdata.target.is_absolute():
-                        new_rdata.target = dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.target.derelativize(zone.origin))), origin=new_zone.origin)
+                        new_rdata = new_rdata.replace(target=dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.target.derelativize(zone.origin))), origin=new_zone.origin))
                 elif rdataset.rdtype == dns.rdatatype.MX:
                     if not new_rdata.exchange.is_absolute():
-                        new_rdata.exchange = dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.exchange.derelativize(zone.origin))), origin=new_zone.origin)
+                        new_rdata = new_rdata.replace(exchange=dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.exchange.derelativize(zone.origin))), origin=new_zone.origin))
                 elif rdataset.rdtype == dns.rdatatype.NS:
                     if not new_rdata.target.is_absolute():
-                        new_rdata.target = dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.target.derelativize(zone.origin))), origin=new_zone.origin)
+                        new_rdata = new_rdata.replace(target=dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.target.derelativize(zone.origin))), origin=new_zone.origin))
                 elif rdataset.rdtype == dns.rdatatype.SRV:
                     if not new_rdata.target.is_absolute():
-                        new_rdata.target = dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.target.derelativize(zone.origin))), origin=new_zone.origin)
+                        new_rdata = new_rdata.replace(target=dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.target.derelativize(zone.origin))), origin=new_zone.origin))
 
                 new_rdataset.add(new_rdata, ttl=rdataset.ttl)
     return new_zone

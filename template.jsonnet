@@ -9,7 +9,7 @@
         CodeUri: 'src/',
         Handler: 'lambda_function.lambda_handler',
         Role: 'arn:aws:iam::789035092620:role/LambdaDnsAxfr',
-        Runtime: 'python3.7',
+        Runtime: 'python3.9',
         Timeout: 20,
         Environment: {
           Variables: {
