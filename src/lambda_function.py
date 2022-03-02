@@ -315,7 +315,7 @@ def perform_mirror(domain_names, domain_name, master_zone, route53_zone_id, rout
     else:
         vpc_serial = None
 
-    domain_names_to_ignore = [n for n in domain_names if n != domain_name]
+    domain_names_to_ignore = [n for n in domain_names if n != domain_name and not domain_name.endswith(n)]
 
     if vpc_serial and (vpc_serial > serial):
         print('ERROR: Route 53 VPC serial %s for domain %s is greater than existing serial %s' % (str(vpc_serial), domain_name, str(serial)))
