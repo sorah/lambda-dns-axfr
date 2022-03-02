@@ -190,6 +190,8 @@ def diff_zones(domain, zone1, zone2, ignore_ttl, domain_names_to_ignore):
                 record1 = node1.get_rdataset(record2.rdclass, record2.rdtype)
                 if record2.rdtype == dns.rdatatype.SOA:
                     continue
+                if record2.rdtype == dns.rdatatype.NS and (str(node) + '.' + str(zone2.origin)) == domain:
+                    continue
                 if record2.rdtype == dns.rdatatype.NS and str(node) == '@':
                     continue
 
