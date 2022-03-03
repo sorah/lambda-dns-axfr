@@ -175,6 +175,7 @@ def diff_zones(domain, zone1, zone2, ignore_ttl, domain_names_to_ignore):
         if not check_record_target(domain, str(node), zone2.origin):
             continue
 
+        # Ignore other zones, including NS delegation record on parent zone (in case of nested)
         ignore = False
         for ignore_domain in domain_names_to_ignore:
             if check_record_target(ignore_domain, str(node), zone1.origin):
@@ -185,12 +186,18 @@ def diff_zones(domain, zone1, zone2, ignore_ttl, domain_names_to_ignore):
 
         node1 = zone1.get_node(node)
         node2 = zone2.get_node(node)
+
+        # Ignore zone NS authoritative record of nested zone
+        for record2 in node2:
+            if record2.rdtype == dns.rdatatype.NS and (str(node) + '.' + str(zone2.origin)) == domain:
+                ignore = True
+        if ignore:
+            break
+
         if node1:
             for record2 in node2:
                 record1 = node1.get_rdataset(record2.rdclass, record2.rdtype)
                 if record2.rdtype == dns.rdatatype.SOA:
-                    continue
-                if record2.rdtype == dns.rdatatype.NS and (str(node) + '.' + str(zone2.origin)) == domain:
                     continue
                 if record2.rdtype == dns.rdatatype.NS and str(node) == '@':
                     continue
