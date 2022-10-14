@@ -127,18 +127,23 @@ def convert_zone(domain, zone):
                         new_rdata = new_rdata.replace(target=dns.name.from_text(adjust_node_name(zone.origin, domain, str(new_rdata.target.derelativize(zone.origin))), origin=new_zone.origin))
 
                 new_rdataset.add(new_rdata, ttl=rdataset.ttl)
+
     return new_zone
 
 # Perform a diff against the two zones and return difference set
 def diff_zones(domain, zone1, zone2, ignore_ttl, domain_names_to_ignore):
     differences = []
     for node in zone1: # Process existing
+        # Ignore record `node` in `zone1.origin` not under `domain`
         if not check_record_target(domain, str(node), zone1.origin):
+            #print("Ignoring record node=%s origin=%s domain=%s" % (str(node), zone1.origin, domain))
             continue
 
+        # Ignore records under child nested zone
         ignore = False
         for ignore_domain in domain_names_to_ignore:
             if check_record_target(ignore_domain, str(node), zone1.origin):
+                #print("Ignoring record node=%s origin=%s ignore_domain=%s" % (str(node), zone1.origin, ignore_domain))
                 ignore = True
                 break
         if ignore:
@@ -172,13 +177,16 @@ def diff_zones(domain, zone1, zone2, ignore_ttl, domain_names_to_ignore):
                         differences.append(change)
 
     for node in zone2:
+        # Ignore record `node` in `zone1.origin` not under `domain`
         if not check_record_target(domain, str(node), zone2.origin):
+            #print("Ignoring record node=%s origin=%s domain=%s" % (str(node), zone1.origin, domain))
             continue
 
         # Ignore other zones, including NS delegation record on parent zone (in case of nested)
         ignore = False
         for ignore_domain in domain_names_to_ignore:
             if check_record_target(ignore_domain, str(node), zone1.origin):
+                #print("Ignoring record node=%s origin=%s ignore_domain=%s" % (str(node), zone1.origin, ignore_domain))
                 ignore = True
                 break
         if ignore:
@@ -192,7 +200,7 @@ def diff_zones(domain, zone1, zone2, ignore_ttl, domain_names_to_ignore):
             if record2.rdtype == dns.rdatatype.NS and (str(node) + '.' + str(zone2.origin)) == domain:
                 ignore = True
         if ignore:
-            break
+            continue
 
         if node1:
             for record2 in node2:
