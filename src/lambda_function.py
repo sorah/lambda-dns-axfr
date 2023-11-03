@@ -312,6 +312,9 @@ def lambda_handler(event, context):
             else:
                 recordname = recordname.rstrip('.')
             rdataset = vpc_zone.find_rdataset(recordname, rdtype=str(record['Type']), create=True)
+            # maybe alias record
+            if not 'ResourceRecords' in record:
+                continue
             for value in record['ResourceRecords']:
                 rdata = dns.rdata.from_text(1, rdataset.rdtype, value['Value'])
                 rdataset.add(rdata, ttl=int(record['TTL']))
